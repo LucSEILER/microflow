@@ -1,10 +1,17 @@
 const fs = require('fs');
 const path = require('path');
 
+const data = [
+  { "id": 1, "name": "Alice", "email": "alice@example.com" },
+  { "id": 2, "name": "Bob", "email": "bob@example.com" }
+]
+
 const getData = () => {
-  const filePath = path.join(__dirname, '../data.json');
-  const jsonData = fs.readFileSync(filePath, 'utf-8');
-  return JSON.parse(jsonData);
+  return data;
 };
 
-module.exports = { getData };
+const getDataById = (id) => {
+  return data.find((user) => user.id === Number(id));
+};
+
+module.exports = { getData, getDataById };

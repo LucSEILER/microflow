@@ -1,0 +1,46 @@
+name: CI Pipeline
+
+on:
+  push:
+    # branches:
+    #   - main
+    #   - dev
+  pull_request:
+    # branches:
+    #   - main
+    #   - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm install
+
+      - name: Run tests
+        run: |
+          cd backend
+          npm test
+
+      - name: Build microservices
+        run: |
+          cd backend
+          npm run 
+
+      - name: Send result to Discord Webhook
+        if: always()
+        run: |
+          RESULT=$(if [ ${{ steps.tests.outcome }} == 'success' ]; then echo "Tests Passed"; else echo "Tests Failed"; fi)
+          curl -X POST -H "Content-Type: application/json" \
+            -d '{"content": "CI Test Results: '"$RESULT"' on branch '${GITHUB_REF}'made by '${GITHUB_ACTOR}'" }' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
