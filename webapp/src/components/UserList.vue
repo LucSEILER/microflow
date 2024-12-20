@@ -26,7 +26,7 @@
             async fetchUsers() {
             try {
                 const response = await axios.get('http://localhost:3000/api/v1');
-                this.users = response.data.users; // Stocke les données dans "users"
+                this.users = response.data; // Stocke les données dans "users"
             } catch (error) {
                 console.error('Error fetching users:', error);
             }
