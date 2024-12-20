@@ -42,5 +42,5 @@ jobs:
         run: |
           RESULT=$(if [ ${{ steps.tests.outcome }} == 'success' ]; then echo "Tests Passed"; else echo "Tests Failed"; fi)
           curl -X POST -H "Content-Type: application/json" \
-            -d '{"content": "CI Test Results: '"$RESULT"' on branch '${GITHUB_REF}'" made by '${GITHUB_ACTOR}' \
+            -d '{"content": "CI Test Results: '"$RESULT"' on branch '${GITHUB_REF}'made by '${GITHUB_ACTOR}'" }' \
             ${{ secrets.DISCORD_WEBHOOK_URL }}
