@@ -35,4 +35,12 @@ jobs:
       - name: Build microservices
         run: |
           cd backend
-          npm run build
+          npm run 
+
+      - name: Send result to Discord Webhook
+        if: always()
+        run: |
+          RESULT=$(if [ ${{ steps.tests.outcome }} == 'success' ]; then echo "Tests Passed"; else echo "Tests Failed"; fi)
+          curl -X POST -H "Content-Type: application/json" \
+            -d '{"content": "CI Test Results: '"$RESULT"' on branch '${GITHUB_REF}'"}' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
