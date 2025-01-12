@@ -56,17 +56,17 @@ jobs:
       #     docker push $IMAGE_NAME:$TAG
       #     docker push $IMAGE_NAME:latest
 
-      # - name: Build and analyze on Sonar
-      #   runs-on: ubuntu-latest
+      - name: Build and analyze on Sonar
+        runs-on: ubuntu-latest
     
-      #   steps:
-      #     - uses: actions/checkout@v4
-      #       with:
-      #         fetch-depth: 0
-      #     - uses: sonarsource/sonarqube-scan-action@v3
-      #       env:
-      #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        steps:
+          - uses: actions/checkout@v4
+            with:
+              fetch-depth: 0
+          - uses: sonarsource/sonarqube-scan-action@v3
+            env:
+              SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+              SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Send result to Discord Webhook
         if: always()
