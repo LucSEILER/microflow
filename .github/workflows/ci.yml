@@ -69,18 +69,42 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
   
+  # notify:
+  #   name: Notify on Discord
+  #   runs-on: ubuntu-latest
+  #   needs: [build, analyze]
+  #   steps:
+  #     - name: Send result to Discord Webhook
+  #       if: always()
+  #       run: |
+  #         RESULT=$(if [ ${{ steps.build.outcome }} == 'success' ]; then echo "Build Passed"; else echo "Build Failed"; fi)
+  #         curl -X POST -H "Content-Type: application/json" \
+  #           -d '{"content": "CI Build Result: '"$RESULT"' on branch '${GITHUB_REF}'made by '${GITHUB_ACTOR}'" }' \
+  #           ${{ secrets.DISCORD_WEBHOOK_URL }}
+
   notify:
-    name: Notify on Discord
-    runs-on: ubuntu-latest
-    needs: [build, analyze]
-    steps:
-      - name: Send result to Discord Webhook
-        if: always()
-        run: |
-          RESULT=$(if [ ${{ steps.build.outcome }} == 'success' ]; then echo "Build Passed"; else echo "Build Failed"; fi)
-          curl -X POST -H "Content-Type: application/json" \
-            -d '{"content": "CI Build Result: '"$RESULT"' on branch '${GITHUB_REF}'made by '${GITHUB_ACTOR}'" }' \
-            ${{ secrets.DISCORD_WEBHOOK_URL }}
+    name: Notify on Slack
+      if: always() # Cette étape s'exécute même si le pipeline échoue
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        STATUS="success"
+        if [ "${{ job.status }}" != "success" ]; then
+          STATUS="failure"
+        fi
+
+        curl -X POST -H 'Content-type: application/json' --data "{
+          \"text\": \"Pipeline *${{ github.workflow }}* a terminé avec le statut: *$STATUS*\",
+          \"blocks\": [
+            {
+              \"type\": \"section\",
+              \"text\": {
+                \"type\": \"mrkdwn\",
+                \"text\": \":construction_worker: *CI/CD Pipeline Notification*\n\n*Repository*: <${{ github.repository }}>\n*Statut*: *$STATUS*\n*Workflow*: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Voir les détails>\"
+              }
+            }
+          ]
+        }" $SLACK_WEBHOOK_URL
 
       # - name: Send result to Discord Webhook
       #   if: always()
