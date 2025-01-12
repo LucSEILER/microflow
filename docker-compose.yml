@@ -1,0 +1,15 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+    command: npm start
+
+  webapp:
+    build:
+      context: ./webapp
+    ports:
+      - "8080:80"
