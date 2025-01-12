@@ -68,10 +68,10 @@ jobs:
               SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
               SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-          - name: Send result to Discord Webhook
-            if: always()
-            run: |
-              RESULT=$(if [ ${{ steps.tests.outcome }} == 'success' ]; then echo "Tests Passed"; else echo "Tests Failed"; fi)
-              curl -X POST -H "Content-Type: application/json" \
-                -d '{"content": "CI Test Results: '"$RESULT"' on branch '${GITHUB_REF}'made by '${GITHUB_ACTOR}'" }' \
-                ${{ secrets.DISCORD_WEBHOOK_URL }}
+      - name: Send result to Discord Webhook
+        if: always()
+        run: |
+          RESULT=$(if [ ${{ steps.tests.outcome }} == 'success' ]; then echo "Tests Passed"; else echo "Tests Failed"; fi)
+          curl -X POST -H "Content-Type: application/json" \
+            -d '{"content": "CI Test Results: '"$RESULT"' on branch '${GITHUB_REF}'made by '${GITHUB_ACTOR}'" }' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
