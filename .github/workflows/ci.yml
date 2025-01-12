@@ -82,9 +82,8 @@ jobs:
   #           -d '{"content": "CI Build Result: '"$RESULT"' on branch '${GITHUB_REF}'made by '${GITHUB_ACTOR}'" }' \
   #           ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-  notify:
-    name: Notify on Slack
-      if: always() # Cette étape s'exécute même si le pipeline échoue
+    - name: Notify on Slack
+      if: always()
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       run: |
@@ -93,6 +92,11 @@ jobs:
           STATUS="failure"
         fi
 
+        BRANCH_NAME="${{ github.ref_name }}"
+        AUTHOR_NAME="${{ github.actor }}"
+        REPO_URL="https://github.com/${{ github.repository }}"
+        RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
         curl -X POST -H 'Content-type: application/json' --data "{
           \"text\": \"Pipeline *${{ github.workflow }}* a terminé avec le statut: *$STATUS*\",
           \"blocks\": [
@@ -100,7 +104,7 @@ jobs:
               \"type\": \"section\",
               \"text\": {
                 \"type\": \"mrkdwn\",
-                \"text\": \":construction_worker: *CI/CD Pipeline Notification*\n\n*Repository*: <${{ github.repository }}>\n*Statut*: *$STATUS*\n*Workflow*: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Voir les détails>\"
+                \"text\": \":construction_worker: *CI/CD Pipeline Notification*\n\n*Repository*: <$REPO_URL|${{ github.repository }}>\n*Branch*: \`$BRANCH_NAME\`\n*Author*: \`$AUTHOR_NAME\`\n*Statut*: *$STATUS*\n*Workflow*: <$RUN_URL|Voir les détails>\"
               }
             }
           ]
