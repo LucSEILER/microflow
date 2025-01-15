@@ -2,6 +2,7 @@ services:
   backend:
     build:
       context: ./backend
+    image: luc-seiler/microflow-backend:latest
     ports:
       - "3000:3000"
     volumes:
@@ -11,5 +12,6 @@ services:
   webapp:
     build:
       context: ./webapp
+    image: lucseiler/microflow-webapp:latest
     ports:
       - "8080:80"
