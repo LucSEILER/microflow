@@ -65,11 +65,11 @@ jobs:
 
       - name: Push Backend Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/microflow-backend:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-backend:latest
 
       - name: Push Webapp Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/microflow-webapp:latest
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-webapp:latest
 
   notify:
     name: Notify on Slack
