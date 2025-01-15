@@ -2,7 +2,7 @@ services:
   backend:
     build:
       context: ./backend
-    image: luc-seiler/microflow-backend:latest
+    image: lucseiler/microflow-backend:latest
     ports:
       - "3000:3000"
     volumes:
