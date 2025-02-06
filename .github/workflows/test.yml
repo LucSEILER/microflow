@@ -5,8 +5,8 @@ on:
   pull_request:
 
 jobs:
-  build:
-    name: Build & update version
+  version-retrieval:
+    name: Version retrieval
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -16,3 +16,8 @@ jobs:
         run: |
           VERSION="0.0.1"
           echo "Current version: $VERSION"
+
+          jq --arg v "$VERSION" '.version = $v' version.json > tmp.json && mv tmp.json version.json
+
+          # Sauvegarder la version pour l'utiliser dans les étapes suivantes
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
