@@ -12,6 +12,7 @@ on:
 
 jobs:
   build:
+    name: Build & test application
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -22,32 +23,42 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install dependencies
+      - name: Install backend dependencies
         run: |
           cd backend
           npm install
 
-      - name: Run tests
+      - name: Run backend tests
         run: |
           cd backend
           npm test
 
-  analyze:
-    name: Build and analyze on Sonar
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: sonarsource/sonarqube-scan-action@v3
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-  
-  build-and-push:
-    runs-on: ubuntu-latest
+      - name: Install webapp dependencies
+        run: |
+          cd webapp
+          npm install
 
+      - name: Build webapp
+        run: |
+          cd webapp
+          npm run build --if-present
+
+  # analyze:
+  #   name: Code analyze on SonarQube
+  #   runs-on: ubuntu-latest
+    
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #     - uses: sonarsource/sonarqube-scan-action@v3
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  
+  docker-push:
+    name: Push Docker images (backend & webapp)
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -73,7 +84,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [build-and-push]
+    needs: [docker-push]
     steps:
       - name: Deploy Docker images in production environment
         uses: appleboy/ssh-action@v1.2.0
@@ -90,7 +101,8 @@ jobs:
   notify:
     name: Notify on Slack
     runs-on: ubuntu-latest
-    needs: [build, analyze, build-and-push, deploy]
+    # needs: [build, analyze, build-and-push, deploy]
+    needs: [build, docker-push, deploy]
     if: always()
     steps:
       - name: Send result to Slack Webhook
@@ -109,13 +121,13 @@ jobs:
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
           curl -X POST -H 'Content-type: application/json' --data "{
-            \"text\": \"Pipeline *${{ github.workflow }}* a terminé avec le statut: *$STATUS*\",
+            \"text\": \"Pipeline *${{ github.workflow }}* finished with status: *$STATUS*\",
             \"blocks\": [
               {
                 \"type\": \"section\",
                 \"text\": {
                   \"type\": \"mrkdwn\",
-                  \"text\": \":construction_worker: *CI/CD Pipeline Notification*\n\n*Repository*: <$REPO_URL|${{ github.repository }}>\n*Branch*: \`$BRANCH_NAME\`\n*Author*: \`$AUTHOR_NAME\`\n*Statut*: *$STATUS*\n*Workflow*: <$RUN_URL|Voir les détails>\"
+                  \"text\": \":construction_worker: *CI/CD Pipeline Notification*\n\n*Repository*: <$REPO_URL|${{ github.repository }}>\n*Branch*: \`$BRANCH_NAME\`\n*Author*: \`$AUTHOR_NAME\`\n*Statut*: *$STATUS*\n*Workflow*: <$RUN_URL|See details>\"
                 }
               }
             ]
