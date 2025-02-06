@@ -6,14 +6,13 @@ on:
 
 jobs:
   build:
-    name: Build & test application
+    name: Build & update version
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-  get-version:
-    name: Get version from version.json
-    runs-on: ubuntu-latest
-    steps:
-    - name: Get version
-      run: echo "VERSION=$(jq -r .version version.json)" >> $GITHUB_ENV
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Display current version
+        run: |
+          VERSION="0.0.1"
+          echo "Current version: $VERSION"
