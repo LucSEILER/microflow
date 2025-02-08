@@ -50,18 +50,13 @@ jobs:
       - name: Build Docker Image
         run: docker-compose build
 
-      - name: Tag Docker images with release tag
-        run: |
-          docker tag microflow-backend:latest ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-backend:${{ github.ref_name }}
-          docker tag microflow-webapp:latest ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-webapp:${{ github.ref_name }}
-
       - name: Push Backend Image
         run: |
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-backend:${{ github.ref_name }}
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-backend:latest
 
       - name: Push Webapp Image
         run: |
-          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-webapp:${{ github.ref_name }}
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-webapp:latest
 
   deploy:
     name: Deploy Docker images in production environment
@@ -75,10 +70,10 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-backend:${{ github.ref_name }}
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-webapp:${{ github.ref_name }}
-            docker run -d ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-backend:${{ github.ref_name }}
-            docker run -d ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-webapp:${{ github.ref_name }}
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-backend:latest
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-webapp:latest
+            docker run -d ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-backend:latest
+            docker run -d ${{ secrets.DOCKER_HUB_USERNAME }}/microflow-webapp:latest
 
   notify:
     name: Notify on Slack

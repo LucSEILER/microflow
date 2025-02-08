@@ -17,3 +17,4 @@
 ### Technical adjusments
 
 - Pipeline adjusments
+- Fix docker image pushing error
