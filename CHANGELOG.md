@@ -18,3 +18,9 @@
 
 - Pipeline adjusments
 - Fix docker image pushing error
+
+## [1.0.2] - 2025-02-09
+
+### Technical adjusments
+
+- Documentation improvements
